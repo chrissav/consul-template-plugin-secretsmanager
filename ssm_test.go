@@ -34,7 +34,7 @@ func TestGetParamValue(t *testing.T) {
 			Name:  &paramName,
 			Type:  &paramType,
 			Value: &paramValue}}
-	output string = getParamValue(&input)
+	output := getParamValue(&input)
 	if output != paramValue {
 		t.Errorf("Function should return param value")
 	}

@@ -1,0 +1,137 @@
+---
+#-----------------------------------------------------------------------------------------------------------------------
+# Resource Types
+#-----------------------------------------------------------------------------------------------------------------------
+resource_types    :
+
+- name          : pull-request
+  type          : docker-image
+  source        :
+    repository  : jtarchie/pr
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Resources
+#-----------------------------------------------------------------------------------------------------------------------
+resources:
+
+- name: source-code
+  type: git
+  source:
+    uri: {{github_repository_uri}}
+    branch: master
+
+- name: release-candidate
+  type: github-release
+  source:
+    user: {{github_organization}}
+    repository: {{github_repository}}
+    access_token: {{github_access_token}}
+    pre_release: true
+
+- name: version
+  type: semver
+  source:
+    driver: git
+    initial_version: 0.0.0-rc.1
+    uri: {{github_repository_uri}}
+    branch: version
+    file: version
+
+- name: pull-request
+  type: pull-request
+  source:
+    uri: {{github_repository_uri}}
+    repo: {{github_pr_repository}}
+    access_token: {{github_access_token}}
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Jobs
+#-----------------------------------------------------------------------------------------------------------------------
+jobs:
+
+#
+# Merge to master
+#
+- name: unit-tests
+  plan:
+
+  # Trigger unit tests when the source code is updated
+  - get: source-code
+    trigger: true
+    version: every
+
+  # Run unit tests
+  - task: tests
+    file: source-code/ci/tasks/unit-tests.yml
+
+- name: build & release
+  serial: true
+  plan:
+
+  # Trigger unit tests when the source code is updated
+  - get: source-code
+    trigger: true
+    passed: [unit-tests]
+    version: every
+
+  # Build the binary
+  - task: build
+    file: source-code/ci/tasks/build.yml
+
+  # Create Release Candidate
+
+  # Bump the rc version
+  - put: version
+    params:
+      pre: 'rc'
+
+  # Create a release artifact
+  - task: create-artifact
+    file: source-code/ci/tasks/create-artifacts.yml
+
+  # Upload a release candidate to GitHub
+  - put: release-candidate
+    params:
+      name: version/version
+      tag: version/version
+      body: artifacts/release-body
+      globs:
+      - artifacts/*.tar.gz
+
+# Trigger unit tests on PR
+#-----------------------------------------------------------------------------------------------------------------------
+- name: pr-unit-tests
+  public: false
+  serial: true
+  plan:
+
+  # Trigger unit tests when a PR is submitted
+  - get: pull-request
+    trigger: true
+    version: every
+
+  # Set the unit test github status for this PR to pending
+  - put: pull-request
+    params:
+      path: pull-request
+      context: unit-tests
+      status: pending
+
+  # Run unit tests
+  - task: tests
+    file: pull-request/ci/tasks/unit-tests-pr.yml
+    # If successful, set the unit test github status for this PR to success
+    on_success:
+      put: pull-request
+      params:
+        path: pull-request
+        context: unit-tests
+        status: success
+
+    # If unsuccessful, set the unit test github status for this PR to unsuccessful
+    on_failure:
+      put: pull-request
+      params:
+        path: pull-request
+        context: unit-tests
+        status: failure
