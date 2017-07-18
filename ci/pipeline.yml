@@ -27,6 +27,7 @@ resources:
     repository: {{github_repository}}
     access_token: {{github_access_token}}
     pre_release: true
+    release: false
 
 - name: version
   type: semver
@@ -43,6 +44,7 @@ resources:
     uri: {{github_repository_uri}}
     repo: {{github_pr_repository}}
     access_token: {{github_access_token}}
+    disable_forks: true
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Jobs
@@ -102,7 +104,6 @@ jobs:
 #-----------------------------------------------------------------------------------------------------------------------
 - name: pr-unit-tests
   public: false
-  serial: true
   plan:
 
   # Trigger unit tests when a PR is submitted
