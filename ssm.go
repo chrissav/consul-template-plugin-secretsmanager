@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ssm"
@@ -20,16 +22,22 @@ func parseInput(args []string) (string, error) {
 	return args[0], nil
 }
 
+func retrieveEnv() (string, error) {
+	filebyte, err := ioutil.ReadFile("/opt/environment")
+	out := string(filebyte[:])
+	out = strings.TrimSuffix(out, "\n")
+	return out, err
+}
+
 // Creates an AWS session
 // Retrieves and decrypts a given parameter
-func retriveParam(name string) (*ssm.GetParameterOutput, error) {
+func retrieveParam(paramName string, getEnvOutput string) (*ssm.GetParameterOutput, error) {
+	ssmPath := getEnvOutput + paramName
 	sess := session.Must(session.NewSession())
 	svc := ssm.New(sess)
-
 	decrypt := true
-
 	out, err := svc.GetParameter(&ssm.GetParameterInput{
-		Name:           &name,
+		Name:           &ssmPath,
 		WithDecryption: &decrypt})
 	return out, err
 }
@@ -67,7 +75,8 @@ func main() {
 			fmt.Println(out)
 		}
 	} else {
-		out, err := retriveParam(paramName)
+		getEnvOutput, err := retrieveEnv()
+		out, err := retrieveParam(paramName, getEnvOutput)
 		if err != nil {
 			log.Println("There was an error fetching/decrypting the parameter:", paramName)
 			log.Fatal(err.Error())
