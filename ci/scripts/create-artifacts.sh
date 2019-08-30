@@ -14,5 +14,5 @@ git log -n1 --oneline > $CWD/artifacts/release-body
 cd $CWD/artifact
 
 echo "Creating release"
-tar -czf ssm.tar.gz ssm
-mv ssm.tar.gz ${CWD}/artifacts/
+tar -czf secretsmanager.tar.gz secretsmanager
+mv secretsmanager.tar.gz ${CWD}/artifacts/
