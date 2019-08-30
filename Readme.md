@@ -21,7 +21,7 @@ The built binary is placed in the `dist/` directory
 
 Place the binary in the PATH (or use the full path), inside the consul-template use:
 ```
-{{ plugin: "ssm" <parameter name> }}
+{{ plugin: "aws-secretsmanager" <parameter name> }}
 ```
 
 ## Contributing
