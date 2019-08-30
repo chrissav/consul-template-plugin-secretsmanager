@@ -1,12 +1,6 @@
-<p align="center">
-  <a href="https://hellofresh.com">
-    <img width="120" src="https://www.hellofresh.de/images/hellofresh/press/HelloFresh_Logo.png">
-  </a>
-</p>
+# consul-template-plugin-secretsmanager
 
-# consul-template-plugin-ssm
-
-Plugin for consul-template to retrieve and decrypt from AWS SSM and KMS.
+Plugin for consul-template to retrieve and decrypt from AWS Secrets Manager
 
 ## Building
 Run make from the root directory:
