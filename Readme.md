@@ -11,6 +11,23 @@ Run make from the root directory:
 
 The built binary is placed in the `dist/` directory
 
+## Installing
+
+To install with `go`:
+`go get -v github.com/chrissav/consul-template-plugin-secretsmanager`
+
+Rename, move, or symlink the binary to `secretsmanager` in your path.
+
+For example (this assumes your $GOPATH is in your $PATH):
+```
+ln -s $(which consul-template-plugin-secretsmanager) ~/.go/bin/secretsmanager
+```
+
+Confirm `secretsmanager` is in your path:
+```
+which secretsmanager
+```
+
 ## Running tests
 
 `make test`
