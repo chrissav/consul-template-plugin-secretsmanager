@@ -14,7 +14,9 @@ The built binary is placed in the `dist/` directory
 ## Installing
 
 To install with `go`:
-`go get -v github.com/chrissav/consul-template-plugin-secretsmanager`
+```
+go get -v github.com/chrissav/consul-template-plugin-secretsmanager
+```
 
 Rename, move, or symlink the binary to `secretsmanager` in your path.
 
