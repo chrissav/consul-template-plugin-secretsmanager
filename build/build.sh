@@ -16,4 +16,9 @@ echo "Building application version $VERSION"
 OS=linux
 ARCH=amd64
 echo "Building binaries for $OS/$ARCH..."
-GOARCH=$ARCH GOOS=$OS CGO_ENABLED=0 go build -ldflags "-s -w" -ldflags "-X main.version=${VERSION}" -o "dist/secretsmanager" secretsmanager.go
+GOARCH=$ARCH GOOS=$OS CGO_ENABLED=0 go build -ldflags "-s -w" -ldflags "-X main.version=${VERSION}" -o "dist/secretsmanager_${OS}_${ARCH}" secretsmanager.go
+
+OS=darwin
+ARCH=amd64
+echo "Building binaries for $OS/$ARCH..."
+GOARCH=$ARCH GOOS=$OS CGO_ENABLED=0 go build -ldflags "-s -w" -ldflags "-X main.version=${VERSION}" -o "dist/secretsmanager_${OS}_${ARCH}" secretsmanager.go
